@@ -579,7 +579,7 @@
     { cat: "Okulu Konumlandırma", text: "Benim için okul...", opts: ["Sadece hizmet aldığım bir yer.", "Daha çok hizmet odaklı bir yer.", "Hizmet aldığım bir yer ama ayrıca bir öğrenme topluluğu olduğunu da düşünüyorum.", "Bir öğrenme topluluğu.", "Velilerin de paydaşı olduğu bir öğrenme topluluğu."] }
   ];
 
-  var CLASSES = ['Anaokulu','1. Sınıf','2. Sınıf','3. Sınıf','4. Sınıf','5. Sınıf','6. Sınıf','7. Sınıf','8. Sınıf','9. Sınıf','10. Sınıf','11. Sınıf','12. Sınıf'];
+  var CLASSES = ['4 Yaş','5 Yaş','1. Sınıf','2. Sınıf','3. Sınıf','4. Sınıf','5. Sınıf','6. Sınıf','7. Sınıf','8. Sınıf'];
 
   /* state */
   var step = -1; /* -1=intro, 0-6=question, 7=form, 8=result */
@@ -744,14 +744,10 @@
       label = 'Uygun'; emoji = '✅'; positive = true;
       bg = 'background:linear-gradient(145deg,#d1fae5,#6ee7b7)';
       desc = 'Eğitim anlayışınız Fide Okulları\'nın yaklaşımıyla uyumlu görünüyor. Birlikte güzel bir eğitim yolculuğu paylaşabiliriz.';
-    } else if (total >= 14) {
+    } else {
       label = 'Uygun Olmayabilir'; emoji = '💡'; positive = false;
       bg = 'background:linear-gradient(145deg,#dbeafe,#93c5fd)';
       desc = 'Bazı alanlarda farklı beklentileriniz olabilir. Sizinle daha detaylı görüşmek için en kısa sürede iletişime geçeceğiz.';
-    } else {
-      label = 'Uygun Olmayabilir'; emoji = '💡'; positive = false;
-      bg = 'background:linear-gradient(145deg,#fee2e2,#fca5a5)';
-      desc = 'Eğitim anlayışınız Fide Okulları\'nın yaklaşımıyla örtüşmüyor gibi görünüyor. Testi tekrar çözerek farklı bir sonuç elde edebilirsiniz.';
     }
 
     var ctaHTML = '';
@@ -760,7 +756,7 @@
         '<div class="fw-cta-icon">📞</div>' +
         '<div class="fw-cta-text">Bilgileriniz bize ulaştı.<br>En kısa sürede sizinle iletişime geçeceğiz.</div>' +
         '</div>';
-    } else if (total >= 14) {
+    } else {
       ctaHTML = '<div class="fw-cta-box">' +
         '<div class="fw-cta-icon">📞</div>' +
         '<div class="fw-cta-text">Sizi daha detaylı görüşmek için<br>en kısa sürede arayacağız.</div>' +
