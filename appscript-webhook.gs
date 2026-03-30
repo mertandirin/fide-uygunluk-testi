@@ -12,6 +12,9 @@
  *    - "Uygulamayi su kullanici olarak calistir" = Kendiniz
  *    - "Erisim" = Herkes (anonim dahil)
  * 5. Dağitim URL'sini kopyalayip fide-gtm.html'deki WEBHOOK_URL'ye yapistirin
+ *
+ * NOT: Header degisikligi yaptiysaniz, mevcut sayfayi silip yeniden calistirin
+ *      veya header satirini manuel guncelleyin.
  */
 
 var SHEET_NAME = 'Fide Test Verileri';
@@ -25,7 +28,23 @@ var HEADERS = [
   'Skor',
   'Sonuc',
   'Remarketing Haric',
-  'CTA Tipi'
+  'CTA Tipi',
+  'Cevaplanan Soru',
+  'Terk Adimi',
+  'S1 - Karar Verme (Cevap)',
+  'S1 - Karar Verme (Puan)',
+  'S2 - Okulda Sorumluluk (Cevap)',
+  'S2 - Okulda Sorumluluk (Puan)',
+  'S3 - Okul Kurallari (Cevap)',
+  'S3 - Okul Kurallari (Puan)',
+  'S4 - Isbirligi (Cevap)',
+  'S4 - Isbirligi (Puan)',
+  'S5 - Iletisim (Cevap)',
+  'S5 - Iletisim (Puan)',
+  'S6 - Basari Anlayisi (Cevap)',
+  'S6 - Basari Anlayisi (Puan)',
+  'S7 - Okulu Konumlandirma (Cevap)',
+  'S7 - Okulu Konumlandirma (Puan)'
 ];
 
 function doPost(e) {
@@ -43,8 +62,16 @@ function doPost(e) {
       data.fide_skor !== undefined ? data.fide_skor : '',
       data.fide_sonuc || '',
       data.fide_remarketing_haric !== undefined ? data.fide_remarketing_haric : '',
-      data.fide_cta_type || ''
+      data.fide_cta_type || '',
+      data.cevaplanan_soru !== undefined ? data.cevaplanan_soru : '',
+      data.terk_adimi || ''
     ];
+
+    // Soru cevaplarini ekle (7 soru x 2 sutun = 14 sutun)
+    for (var i = 1; i <= 7; i++) {
+      row.push(data['soru' + i + '_cevap'] || '');
+      row.push(data['soru' + i + '_puan'] !== undefined ? data['soru' + i + '_puan'] : '');
+    }
 
     sheet.appendRow(row);
 

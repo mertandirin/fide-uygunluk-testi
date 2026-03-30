@@ -159,7 +159,36 @@ function openWidget(){
   step=-1; answers=[null,null,null,null,null,null,null]; form={name:'',phone:'',grade:''};
   render(); overlay.classList.remove('fw-hidden');
 }
+function getAnswersData(){
+  var data={};
+  var answered=0;
+  for(var i=0;i<QUESTIONS.length;i++){
+    if(answers[i]!==null){
+      data['soru'+(i+1)+'_kategori']=QUESTIONS[i].cat;
+      data['soru'+(i+1)+'_cevap']=QUESTIONS[i].opts[answers[i]];
+      data['soru'+(i+1)+'_puan']=answers[i]+1;
+      answered++;
+    }
+  }
+  data.cevaplanan_soru=answered;
+  return data;
+}
+
 function closeWidget(){
+  // Kullanıcı en az 1 soru cevapladıysa ve formu tamamlamadıysa terk verisi gönder
+  if(step>=1 && step<=7){
+    var answeredCount=0;
+    for(var i=0;i<answers.length;i++) if(answers[i]!==null) answeredCount++;
+    if(answeredCount>0){
+      var partial={event:'fide_test_terk',terk_adimi:step<=6?'soru_'+(step+1):'form'};
+      Object.assign(partial,getAnswersData());
+      sendToWebhook(partial);
+      try{
+        window.dataLayer=window.dataLayer||[];
+        window.dataLayer.push({event:'fide_test_terk',terk_adimi:partial.terk_adimi,cevaplanan_soru:partial.cevaplanan_soru});
+      }catch(ex){}
+    }
+  }
   overlay.classList.add('fw-hidden');
   try{ sessionStorage.setItem('fide_closed','1'); }catch(e){}
 }
@@ -332,8 +361,10 @@ function submitForm(){
   var label=total>=28?'\u00c7ok Uygun':total>=21?'Uygun':'Uygun Olmayabilir';
   var excludeRemarketing = total < 21;
 
-  // Webhook: düz veri
-  sendToWebhook({event:'fide_test_tamamlandi',fide_skor:total,fide_sonuc:label,fide_veli_adi:n,fide_telefon:p,fide_sinif:g,fide_remarketing_haric:excludeRemarketing});
+  // Webhook: düz veri + soru cevapları
+  var webhookData={event:'fide_test_tamamlandi',fide_skor:total,fide_sonuc:label,fide_veli_adi:n,fide_telefon:p,fide_sinif:g,fide_remarketing_haric:excludeRemarketing};
+  Object.assign(webhookData,getAnswersData());
+  sendToWebhook(webhookData);
 
   // dataLayer: hashlenmiş kişisel veri
   Promise.all([sha256(n),sha256(p)]).then(function(hashes){
