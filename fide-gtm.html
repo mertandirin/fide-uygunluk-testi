@@ -9,7 +9,7 @@
         Fide Okullar&#305;
       </div>
       <h1>Fide Size Ne Kadar Uygun?</h1>
-      <p>7 k&#305;sa soruyla e&#287;itim anlay&#305;&#351;&#305;n&#305;z&#305; ke&#351;fedin</p>
+      <p>7 k&#305;sa soruyla bunu hemen &#246;&#287;renin.</p>
     </div>
     <div id="fw-progress-wrap" style="display:none">
       <div id="fw-progress-track"><div id="fw-progress-fill" style="width:0%"></div></div>
@@ -132,14 +132,14 @@ document.head.appendChild(styleEl);
 var QUESTIONS = [
   {cat:'Karar Verme Yakla\u015f\u0131m\u0131',text:'\u00c7ocu\u011fum ile ilgili kararlar\u0131 verirken...',opts:['O anda h\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7enekleri tercih ederim.','H\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7eneklere \u00f6ncelik veririm.','Ko\u015fullara g\u00f6re de\u011ferlendirme yapar\u0131m.','Daha \u00e7ok \u00e7ocu\u011fumun uzun vadeli fayda\u015f\u0131n\u0131 d\u00fc\u015f\u00fcn\u00fcr\u00fcm.','\u00c7ocu\u011fumun uzun vadeli fayda\u015f\u0131n\u0131 her zaman \u00f6nceli\u011fim olarak g\u00f6r\u00fcr\u00fcm.']},
   {cat:'Okulda Sorumluluk',text:'Okuldaki sorumlulu\u011fum...',opts:['Yaln\u0131zca kendi \u00e7ocu\u011fumla s\u0131n\u0131rl\u0131d\u0131r.','Daha \u00e7ok kendi \u00e7ocu\u011fumla ilgili konulara odaklanmakt\u0131r.','Duruma g\u00f6re de\u011fi\u015fir.','Okul ortam\u0131n\u0131n geli\u015fimine katk\u0131 sa\u011flamay\u0131 da i\u00e7erir.','Hem \u00e7ocu\u011fumun hem de okul k\u00fclt\u00fcr\u00fcn\u00fcn geli\u015fimine katk\u0131 sa\u011flamay\u0131 i\u00e7erir.']},
-  {cat:'Okul Kurallar\u0131',text:'Okul kurallar\u0131n\u0131...',opts:['\u00dc\u015f\u00fcnmeden uygular\u0131m.','\u00c7o\u011funlukla sorgulamadan uygular\u0131m.','Uygularken duruma g\u00f6re de\u011ferlendirme yapar\u0131m.','Uygularken arkas\u0131ndaki amac\u0131 anlamaya \u00e7al\u0131\u015f\u0131r\u0131m.','Bana uymasa bile amac\u0131n\u0131 anlamaya \u00e7al\u0131\u015f\u0131r ve desteklerim.']},
+  {cat:'Okul Kurallar\u0131',text:'Okul kurallar\u0131n\u0131...',opts:['D\u00fc\u015f\u00fcnmeden uygular\u0131m.','\u00c7o\u011funlukla sorgulamadan uygular\u0131m.','Uygularken duruma g\u00f6re de\u011ferlendirme yapar\u0131m.','Uygularken arkas\u0131ndaki amac\u0131 anlamaya \u00e7al\u0131\u015f\u0131r\u0131m.','Bana uymasa bile amac\u0131n\u0131 anlamaya \u00e7al\u0131\u015f\u0131r ve desteklerim.']},
   {cat:'\u0130\u015fbirli\u011fi',text:'Okuldan gelen geri bildirimler konusunda...',opts:['Geri bildirimleri her zaman uygulamam.','Baz\u0131 geri bildirimleri uygulamakta zorlanabilirim.','Geri bildirimleri duruma g\u00f6re de\u011ferlendiririm.','Geri bildirimleri dinler ve \u00e7o\u011funlukla dikkate al\u0131r\u0131m.','Geri bildirimleri dikkatle dinler ve her zaman de\u011ferlendirmeye \u00e7al\u0131\u015f\u0131r\u0131m.']},
   {cat:'\u0130leti\u015fim',text:'Okul ile ileti\u015fim konusunda...',opts:['\u0130htiya\u00e7 duyuldu\u011funda ileti\u015fim kurmak yeterlidir.','Genellikle ihtiya\u00e7 an\u0131nda ileti\u015fim kurar\u0131m.','Duruma g\u00f6re ileti\u015fim kurar\u0131m.','D\u00fczenli ileti\u015fim kurmay\u0131 \u00f6nemsiyorum.','S\u00fcrekli ve d\u00fczenli ileti\u015fim kurmay\u0131 \u00e7ok \u00f6nemli buluyorum.']},
   {cat:'Ba\u015far\u0131 Anlay\u0131\u015f\u0131',text:'Benim i\u00e7in \u00e7ocu\u011fum...',opts:['\u00d6zel okulda her \u00e7ocuk gibi ba\u015far\u0131l\u0131 olmal\u0131d\u0131r.','Daha \u00e7ok di\u011fer \u00e7ocuklarla benzer bir ba\u015far\u0131 d\u00fczeyi g\u00f6stermelidir.','Hem standart ba\u015far\u0131y\u0131 yakalamal\u0131 hem de bireysel olarak geli\u015fmelidir.','Kendi geli\u015fimi ve potansiyeli do\u011frultusunda ilerlemelidir.','Kendi bireysel geli\u015fimi ve potansiyeline g\u00f6re de\u011ferlendirilmelidir.']},
-  {cat:'Okulu Konumland\u0131rma',text:'Benim i\u00e7in okul...',opts:['Sadece hizmet ald\u0131\u011f\u0131m bir yer.','Daha \u00e7ok hizmet odakl\u0131 bir yer.','Hizmet ald\u0131\u011f\u0131m bir yer ama ayr\u0131ca bir \u00f6\u011frenme toplulu\u011fu oldu\u011funu da d\u00fc\u015f\u00fcn\u00fcyorum.','\u0130bir \u00f6\u011frenme toplulu\u011fu.','Velilerin de payday oldu\u011fu bir \u00f6\u011frenme toplulu\u011fu.']}
+  {cat:'Okulu Konumland\u0131rma',text:'Benim i\u00e7in okul...',opts:['Sadece hizmet ald\u0131\u011f\u0131m bir yer.','Daha \u00e7ok hizmet odakl\u0131 bir yer.','Hizmet ald\u0131\u011f\u0131m bir yer ama ayr\u0131ca bir \u00f6\u011frenme toplulu\u011fu oldu\u011funu da d\u00fc\u015f\u00fcn\u00fcyorum.','Bir \u00f6\u011frenme toplulu\u011fu.','Velilerin de payda\u015f oldu\u011fu bir \u00f6\u011frenme toplulu\u011fu.']}
 ];
 
-var CLASSES = ['Anaokulu','1. S\u0131n\u0131f','2. S\u0131n\u0131f','3. S\u0131n\u0131f','4. S\u0131n\u0131f','5. S\u0131n\u0131f','6. S\u0131n\u0131f','7. S\u0131n\u0131f','8. S\u0131n\u0131f'];
+var CLASSES = ['4 Ya\u015f','5 Ya\u015f','1. S\u0131n\u0131f','2. S\u0131n\u0131f','3. S\u0131n\u0131f','4. S\u0131n\u0131f','5. S\u0131n\u0131f','6. S\u0131n\u0131f','7. S\u0131n\u0131f','8. S\u0131n\u0131f'];
 
 var step = -1;
 var answers = [null,null,null,null,null,null,null];
