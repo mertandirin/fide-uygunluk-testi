@@ -130,7 +130,7 @@ styleEl.textContent = css;
 document.head.appendChild(styleEl);
 
 var QUESTIONS = [
-  {cat:'Karar Verme Yakla\u015f\u0131m\u0131',text:'\u00c7ocu\u011fum ile ilgili kararlar\u0131 verirken...',opts:['O anda h\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7enekleri tercih ederim.','H\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7eneklere \u00f6ncelik veririm.','Ko\u015fullara g\u00f6re de\u011ferlendirme yapar\u0131m.','Daha \u00e7ok \u00e7ocu\u011fumun uzun vadeli fayda\u015f\u0131n\u0131 d\u00fc\u015f\u00fcn\u00fcr\u00fcm.','\u00c7ocu\u011fumun uzun vadeli fayda\u015f\u0131n\u0131 her zaman \u00f6nceli\u011fim olarak g\u00f6r\u00fcr\u00fcm.']},
+  {cat:'Karar Verme Yakla\u015f\u0131m\u0131',text:'\u00c7ocu\u011fum ile ilgili kararlar\u0131 verirken...',opts:['O anda h\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7enekleri tercih ederim.','H\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7eneklere \u00f6ncelik veririm.','Ko\u015fullara g\u00f6re de\u011ferlendirme yapar\u0131m.','Daha \u00e7ok \u00e7ocu\u011fumun uzun vadeli faydas\u0131n\u0131 d\u00fc\u015f\u00fcn\u00fcr\u00fcm.','\u00c7ocu\u011fumun uzun vadeli faydas\u0131n\u0131 her zaman \u00f6nceli\u011fim olarak g\u00f6r\u00fcr\u00fcm.']},
   {cat:'Okulda Sorumluluk',text:'Okuldaki sorumlulu\u011fum...',opts:['Yaln\u0131zca kendi \u00e7ocu\u011fumla s\u0131n\u0131rl\u0131d\u0131r.','Daha \u00e7ok kendi \u00e7ocu\u011fumla ilgili konulara odaklanmakt\u0131r.','Duruma g\u00f6re de\u011fi\u015fir.','Okul ortam\u0131n\u0131n geli\u015fimine katk\u0131 sa\u011flamay\u0131 da i\u00e7erir.','Hem \u00e7ocu\u011fumun hem de okul k\u00fclt\u00fcr\u00fcn\u00fcn geli\u015fimine katk\u0131 sa\u011flamay\u0131 i\u00e7erir.']},
   {cat:'Okul Kurallar\u0131',text:'Okul kurallar\u0131n\u0131...',opts:['D\u00fc\u015f\u00fcnmeden uygular\u0131m.','\u00c7o\u011funlukla sorgulamadan uygular\u0131m.','Uygularken duruma g\u00f6re de\u011ferlendirme yapar\u0131m.','Uygularken arkas\u0131ndaki amac\u0131 anlamaya \u00e7al\u0131\u015f\u0131r\u0131m.','Bana uymasa bile amac\u0131n\u0131 anlamaya \u00e7al\u0131\u015f\u0131r ve desteklerim.']},
   {cat:'\u0130\u015fbirli\u011fi',text:'Okuldan gelen geri bildirimler konusunda...',opts:['Geri bildirimleri her zaman uygulamam.','Baz\u0131 geri bildirimleri uygulamakta zorlanabilirim.','Geri bildirimleri duruma g\u00f6re de\u011ferlendiririm.','Geri bildirimleri dinler ve \u00e7o\u011funlukla dikkate al\u0131r\u0131m.','Geri bildirimleri dikkatle dinler ve her zaman de\u011ferlendirmeye \u00e7al\u0131\u015f\u0131r\u0131m.']},
@@ -145,6 +145,7 @@ var step = -1;
 var answers = [null,null,null,null,null,null,null];
 var form = {name:'',phone:'',grade:''};
 var lastCta = '';
+var result = {total:0,label:'',excludeRemarketing:false};
 
 var overlay  = document.getElementById('fw-overlay');
 var body     = document.getElementById('fw-body');
@@ -176,16 +177,17 @@ function getAnswersData(){
 
 function closeWidget(){
   // Kullanıcı en az 1 soru cevapladıysa ve formu tamamlamadıysa terk verisi gönder
-  if(step>=1 && step<=7){
+  if(step>=1 && step<=8){
     var answeredCount=0;
     for(var i=0;i<answers.length;i++) if(answers[i]!==null) answeredCount++;
     if(answeredCount>0){
-      var partial={event:'fide_test_terk',terk_adimi:step<=6?'soru_'+(step+1):'form'};
+      var terkAdimi=step<=6?'soru_'+(step+1):step===7?'sonuc_ekrani':'iletisim_formu';
+      var partial={event:'fide_test_terk',terk_adimi:terkAdimi};
       Object.assign(partial,getAnswersData());
       sendToWebhook(partial);
       try{
         window.dataLayer=window.dataLayer||[];
-        window.dataLayer.push({event:'fide_test_terk',terk_adimi:partial.terk_adimi,cevaplanan_soru:partial.cevaplanan_soru});
+        window.dataLayer.push({event:'fide_test_terk',terk_adimi:terkAdimi,cevaplanan_soru:partial.cevaplanan_soru});
       }catch(ex){}
     }
   }
@@ -207,8 +209,8 @@ function render(){
   div.className='fw-slide';
   if(step===-1)       div.innerHTML=introHTML();
   else if(step<=6)    div.innerHTML=questionHTML(step);
-  else if(step===7)   div.innerHTML=formHTML();
-  else if(step===8)   div.innerHTML=resultHTML();
+  else if(step===7)   div.innerHTML=resultHTML();
+  else if(step===8)   div.innerHTML=formHTML();
   else                div.innerHTML=thankYouHTML();
   body.appendChild(div);
   bindEvents();
@@ -235,22 +237,25 @@ function questionHTML(i){
     '<div class="fw-qtext">'+esc(q.text)+'</div>'+
     '<div class="fw-options">'+opts+'</div>'+
     '<div class="fw-nav">'+backBtn+
-    '<button type="button" class="fw-btn-next" data-action="next"'+(answers[i]===null?' disabled':'')+'>'+(isLast?'Formu Doldur':'Devam')+'</button></div>';
+    '<button type="button" class="fw-btn-next" data-action="next"'+(answers[i]===null?' disabled':'')+'>'+(isLast?'Sonucu G\u00f6r':'Devam')+'</button></div>';
 }
 
 function formHTML(){
   var opts=CLASSES.map(function(c){return '<option value="'+esc(c)+'"'+(form.grade===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
-  return '<div class="fw-form-top"><div class="fw-form-icon">&#128203;</div><div class="fw-form-top-text"><h3>Neredeyse bitti!</h3><p>Sonucunuzu g\u00f6rmek i\u00e7in l\u00fctfen<br>bilgilerinizi b\u0131rak\u0131n.</p></div></div>'+
+  return '<div class="fw-form-top"><div class="fw-form-icon">&#128203;</div><div class="fw-form-top-text"><h3>Sizinle ileti\u015fime ge\u00e7elim</h3><p>Bilgilerinizi b\u0131rak\u0131n, size<br>en k\u0131sa s\u00fcrede ula\u015fal\u0131m.</p></div></div>'+
     '<div class="fw-field"><label class="fw-label" for="fw-name">Veli Ad\u0131 Soyad\u0131</label><input class="fw-input" type="text" id="fw-name" placeholder="Ad\u0131n\u0131z Soyad\u0131n\u0131z" value="'+esc(form.name)+'"><div class="fw-err" id="fw-err-name">L\u00fctfen ad\u0131n\u0131z\u0131 ve soyad\u0131n\u0131z\u0131 girin.</div></div>'+
     '<div class="fw-field"><label class="fw-label" for="fw-phone">Telefon Numaras\u0131</label><input class="fw-input" type="tel" id="fw-phone" placeholder="05__ ___ __ __" value="'+esc(form.phone)+'"><div class="fw-err" id="fw-err-phone">L\u00fctfen telefon numaras\u0131n\u0131z\u0131 girin.</div></div>'+
     '<div class="fw-field"><label class="fw-label" for="fw-grade">\u00d6\u011frenci S\u0131n\u0131f Bilgisi</label><select class="fw-select" id="fw-grade"><option value="">S\u0131n\u0131f se\u00e7iniz</option>'+opts+'</select><div class="fw-err" id="fw-err-grade">L\u00fctfen bir s\u0131n\u0131f se\u00e7in.</div></div>'+
     '<div class="fw-kvkk"><input type="checkbox" id="fw-kvkk"><label for="fw-kvkk"><a href="https://www.fideokullari.k12.tr/kvkk/" target="_blank">Ayd\u0131nlatma Metnini</a> okudum ve ki\u015fisel verilerimin i\u015flenmesini kabul ediyorum.</label></div>'+
     '<div class="fw-err" id="fw-err-kvkk">L\u00fctfen ayd\u0131nlatma metnini onaylay\u0131n.</div>'+
-    '<div class="fw-nav"><button type="button" class="fw-btn-back" data-action="back">&#8592; Geri</button><button type="button" class="fw-btn-next" data-action="submit">Sonucumu G\u00f6r</button></div>';
+    '<div class="fw-nav"><button type="button" class="fw-btn-back" data-action="back">&#8592; Geri</button><button type="button" class="fw-btn-next" data-action="submit">G\u00f6nder</button></div>';
 }
 
 function resultHTML(){
   var total=0; for(var i=0;i<answers.length;i++) total+=answers[i]+1;
+  result.total=total;
+  result.label=total>=28?'\u00c7ok Uygun':total>=21?'Uygun':'Uygun Olmayabilir';
+  result.excludeRemarketing=total<21;
   var label,emoji,bg,desc,ctas;
   if(total>=28){
     label='&#199;ok Uygun';emoji='&#11088;';bg='background:linear-gradient(145deg,#fef9c3,#fde68a)';
@@ -329,17 +334,14 @@ function handleAction(e){
   else if(action==='cta'){
     var ctaType=e.currentTarget.getAttribute('data-cta');
     lastCta=ctaType;
-    // Webhook: düz veri
-    sendToWebhook({event:'fide_test_cta',fide_cta_type:ctaType,fide_veli_adi:form.name,fide_telefon:form.phone,fide_sinif:form.grade});
-    // dataLayer: hashlenmiş kişisel veri
-    Promise.all([sha256(form.name),sha256(form.phone)]).then(function(hashes){
-      window.dataLayer=window.dataLayer||[];
-      window.dataLayer.push({event:'fide_test_cta',fide_cta_type:ctaType,fide_veli_adi_hash:hashes[0],fide_telefon_hash:hashes[1],fide_sinif:form.grade});
-    });
-    step=9; render();
+    if(ctaType==='tesekkur'){
+      closeWidget();
+    } else {
+      step=8; render();
+    }
   }
   else if(action==='close'){ closeWidget(); }
-  else if(action==='restart'){ step=-1; answers=[null,null,null,null,null,null,null]; form={name:'',phone:'',grade:''}; render(); }
+  else if(action==='restart'){ step=-1; answers=[null,null,null,null,null,null,null]; form={name:'',phone:'',grade:''}; lastCta=''; result={total:0,label:'',excludeRemarketing:false}; render(); }
 }
 
 function sha256(str){
@@ -357,22 +359,19 @@ function submitForm(){
   toggleErr('fw-err-name',!n); toggleErr('fw-err-phone',!p); toggleErr('fw-err-grade',!g); toggleErr('fw-err-kvkk',!kvkk);
   if(!n||!p||!g||!kvkk) return;
   form={name:n,phone:p,grade:g};
-  var total=0; for(var i=0;i<answers.length;i++) total+=answers[i]+1;
-  var label=total>=28?'\u00c7ok Uygun':total>=21?'Uygun':'Uygun Olmayabilir';
-  var excludeRemarketing = total < 21;
 
-  // Webhook: düz veri + soru cevapları
-  var webhookData={event:'fide_test_tamamlandi',fide_skor:total,fide_sonuc:label,fide_veli_adi:n,fide_telefon:p,fide_sinif:g,fide_remarketing_haric:excludeRemarketing};
+  // Webhook: düz veri + soru cevapları + seçilen CTA
+  var webhookData={event:'fide_test_tamamlandi',fide_skor:result.total,fide_sonuc:result.label,fide_cta_type:lastCta,fide_veli_adi:n,fide_telefon:p,fide_sinif:g,fide_remarketing_haric:result.excludeRemarketing};
   Object.assign(webhookData,getAnswersData());
   sendToWebhook(webhookData);
 
   // dataLayer: hashlenmiş kişisel veri
   Promise.all([sha256(n),sha256(p)]).then(function(hashes){
     window.dataLayer=window.dataLayer||[];
-    window.dataLayer.push({event:'fide_test_tamamlandi',fide_skor:total,fide_sonuc:label,fide_veli_adi_hash:hashes[0],fide_telefon_hash:hashes[1],fide_sinif:g,fide_remarketing_haric:excludeRemarketing});
+    window.dataLayer.push({event:'fide_test_tamamlandi',fide_skor:result.total,fide_sonuc:result.label,fide_cta_type:lastCta,fide_veli_adi_hash:hashes[0],fide_telefon_hash:hashes[1],fide_sinif:g,fide_remarketing_haric:result.excludeRemarketing});
   });
 
-  step=8; render();
+  step=9; render();
 }
 
 function toggleErr(id,show){
