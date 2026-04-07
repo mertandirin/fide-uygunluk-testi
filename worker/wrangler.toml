@@ -1,0 +1,7 @@
+name = "fide-webhook-proxy"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "18469496f20c49248a022525b0ba049b"
