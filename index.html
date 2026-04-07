@@ -185,6 +185,8 @@ function getAnswersData(){
 }
 
 function closeWidget(){
+  // İletişim formu adımında kapatırsa teşekkür ekranı göster
+  if(step===8){ step=9; render(); return; }
   // Kullanıcı en az 1 soru cevapladıysa ve formu tamamlamadıysa terk verisi gönder
   if(step>=1 && step<=8){
     var answeredCount=0;
@@ -341,7 +343,7 @@ function handleAction(e){
     var ctaType=e.currentTarget.getAttribute('data-cta');
     lastCta=ctaType;
     if(ctaType==='tesekkur'){
-      closeWidget();
+      step=9; render();
     } else {
       step=8; render();
     }
