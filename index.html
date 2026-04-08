@@ -51,7 +51,7 @@ function sendToWebhook(payload) {
 
 var css =
 '#fw-wrap *,#fw-wrap *::before,#fw-wrap *::after{box-sizing:border-box !important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;-webkit-font-smoothing:antialiased}' +
-'#fw-wrap{display:block;width:100%;max-width:560px;margin:0 auto}' +
+'#fw-wrap{display:block;width:100%;max-width:560px;margin:0 auto;padding-top:0 !important}' +
 '#fw-card{background:#fff;border-radius:24px;width:100%;display:flex;flex-direction:column;box-shadow:0 4px 32px -4px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07);overflow:hidden}' +
 '#fw-header{background:linear-gradient(145deg,#0d2d6e 0%,#1b479d 55%,#2660c8 100%);padding:28px 28px 26px;position:relative;overflow:hidden;flex-shrink:0}' +
 '#fw-header::before{content:"";position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 65%);border-radius:50%;pointer-events:none}' +
@@ -275,8 +275,7 @@ function thankYouHTML(){
   return '<div class="fw-result-wrap">'+
     '<div class="fw-ty-icon">'+icon+'</div>'+
     '<div class="fw-ty-title">Te\u015fekk\u00fcrler!</div>'+
-    '<div class="fw-ty-desc">'+msg+'</div>'+
-    '<button type="button" class="fw-btn-restart" data-action="restart">Yeniden Ba\u015fla</button></div>';
+    '<div class="fw-ty-desc">'+msg+'</div></div>';
 }
 
 function bindEvents(){
