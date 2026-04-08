@@ -1,0 +1,355 @@
+<div id="fw-wrap">
+  <div id="fw-card">
+    <div id="fw-header">
+      <div class="fw-header-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="6" r="1.8" fill="currentColor"/></svg>
+        Fide Okullar&#305;
+      </div>
+      <h1>Fide Size Ne Kadar Uygun?</h1>
+      <p>7 k&#305;sa soruyla bunu hemen &#246;&#287;renin.</p>
+    </div>
+    <div id="fw-progress-wrap" style="display:none">
+      <div id="fw-progress-track"><div id="fw-progress-fill" style="width:0%"></div></div>
+      <div id="fw-progress-label">Soru 1 / 7</div>
+    </div>
+    <div id="fw-body"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+// ---- WEBHOOK AYARI ----
+var WEBHOOK_URL = 'https://fide-webhook-proxy.contact-5d9.workers.dev';
+
+function sendToWebhook(payload) {
+  if (!WEBHOOK_URL) return;
+  try {
+    fetch(WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) {}
+}
+// ---- WEBHOOK AYARI SONU ----
+
+var css =
+'#fw-wrap *,#fw-wrap *::before,#fw-wrap *::after{box-sizing:border-box !important;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif !important;-webkit-font-smoothing:antialiased}' +
+'#fw-wrap{display:block;width:100%;max-width:560px;margin:0 auto}' +
+'#fw-card{background:#fff;border-radius:24px;width:100%;display:flex;flex-direction:column;box-shadow:0 4px 32px -4px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07);overflow:hidden}' +
+'#fw-header{background:linear-gradient(145deg,#0d2d6e 0%,#1b479d 55%,#2660c8 100%);padding:28px 28px 26px;position:relative;overflow:hidden;flex-shrink:0}' +
+'#fw-header::before{content:"";position:absolute;top:-60px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 65%);border-radius:50%;pointer-events:none}' +
+'#fw-header::after{content:"";position:absolute;bottom:-50px;left:15%;width:130px;height:130px;background:radial-gradient(circle,rgba(255,255,255,0.06) 0%,transparent 65%);border-radius:50%;pointer-events:none}' +
+'.fw-header-badge{display:inline-flex !important;align-items:center;gap:6px;background:rgba(255,255,255,0.14);border-radius:8px;padding:5px 11px;font-size:12px !important;font-weight:600 !important;color:rgba(255,255,255,0.88) !important;letter-spacing:0.3px;margin-bottom:14px}' +
+'#fw-header h1{font-size:22px !important;font-weight:800 !important;color:#fff !important;letter-spacing:-0.6px;line-height:1.25 !important;margin-bottom:5px !important;margin-top:0 !important}' +
+'#fw-header p{font-size:14px !important;color:rgba(255,255,255,0.68) !important;font-weight:400 !important;line-height:1.5 !important;margin:0 !important}' +
+'#fw-progress-wrap{padding:20px 28px 0;flex-shrink:0}' +
+'#fw-progress-track{height:7px;background:#edf2f7;border-radius:99px;overflow:hidden}' +
+'#fw-progress-fill{height:100%;background:linear-gradient(90deg,#1b479d,#4a7de8);border-radius:99px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}' +
+'#fw-progress-fill::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:fw-shimmer 2.2s ease-in-out infinite}' +
+'#fw-progress-label{font-size:12px !important;font-weight:700 !important;color:#94a3b8;text-align:right;margin-top:8px;letter-spacing:0.3px}' +
+'#fw-body{padding:24px 28px 28px;overflow-x:hidden}' +
+'.fw-intro-icon{width:72px;height:72px;border-radius:20px;background:linear-gradient(145deg,#e8f0ff,#dbe6ff);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;box-shadow:0 6px 20px rgba(27,71,157,0.12)}' +
+'.fw-intro-title{font-size:21px !important;font-weight:800 !important;color:#0f172a !important;text-align:center;letter-spacing:-0.5px;line-height:1.3 !important;margin-bottom:12px !important}' +
+'.fw-intro-desc{font-size:15px !important;color:#64748b !important;text-align:center;line-height:1.75 !important;margin-bottom:26px !important;max-width:360px;margin-left:auto !important;margin-right:auto !important}' +
+'.fw-intro-chips{display:flex;justify-content:center;gap:10px;margin-bottom:28px}' +
+'.fw-chip{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:99px;background:#f8fafc;border:1.5px solid #e2e8f0;font-size:13px !important;font-weight:600 !important;color:#475569 !important}' +
+'.fw-cat{display:inline-block !important;font-size:11px !important;font-weight:700 !important;color:#1b479d !important;text-transform:uppercase;letter-spacing:1px;background:#eef4ff;padding:5px 12px;border-radius:7px;margin-bottom:14px}' +
+'.fw-qtext{font-size:18px !important;font-weight:700 !important;color:#0f172a !important;line-height:1.5 !important;letter-spacing:-0.3px;margin-bottom:20px !important}' +
+'.fw-options{display:flex;flex-direction:column;gap:10px}' +
+'.fw-opt{display:flex !important;align-items:center;gap:14px;padding:14px 18px !important;border-radius:14px;border:2px solid #e2e8f0 !important;background:#fff !important;cursor:pointer;transition:border-color 0.18s,background 0.18s,box-shadow 0.18s,transform 0.18s;user-select:none;-webkit-user-select:none;width:100% !important;text-align:left !important;margin:0 !important}' +
+'.fw-opt:hover{border-color:#a5bcf8 !important;background:#f7f9ff !important;box-shadow:0 3px 12px rgba(27,71,157,0.08);transform:translateY(-1px)}' +
+'.fw-opt.fw-sel{border-color:#1b479d !important;background:linear-gradient(135deg,#eef4ff 0%,#dce8ff 100%) !important;box-shadow:0 4px 16px rgba(27,71,157,0.16);transform:translateY(-1px)}' +
+'.fw-radio{flex-shrink:0;width:22px !important;height:22px !important;border-radius:50% !important;border:2px solid #c8d3e0 !important;background:#fff !important;display:flex;align-items:center;justify-content:center;transition:border-color 0.18s,background 0.18s,box-shadow 0.18s;padding:0 !important;margin:0 !important}' +
+'.fw-opt:hover .fw-radio{border-color:#7aa5f0 !important}' +
+'.fw-opt.fw-sel .fw-radio{border-color:#1b479d !important;background:#1b479d !important;box-shadow:0 0 0 3px rgba(27,71,157,0.18)}' +
+'.fw-radio-dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:0;transform:scale(0);transition:opacity 0.15s,transform 0.15s}' +
+'.fw-opt.fw-sel .fw-radio-dot{opacity:1;transform:scale(1)}' +
+'.fw-opt-text{font-size:14.5px !important;color:#334155 !important;line-height:1.55 !important;font-weight:400 !important;transition:color 0.15s}' +
+'.fw-opt.fw-sel .fw-opt-text{color:#0f172a !important;font-weight:600 !important}' +
+'.fw-nav{display:flex;align-items:center;justify-content:space-between;margin-top:26px;gap:10px}' +
+'.fw-btn-back{padding:13px 22px !important;border-radius:12px !important;border:none !important;background:#f1f5f9 !important;color:#64748b !important;font-size:14px !important;font-weight:600 !important;cursor:pointer;transition:background 0.18s;font-family:inherit !important;line-height:1 !important;box-shadow:none !important;text-decoration:none !important;display:inline-flex !important;align-items:center}' +
+'.fw-btn-back:hover{background:#e2e8f0 !important}' +
+'.fw-btn-next{padding:14px 32px !important;border-radius:12px !important;border:none !important;background:linear-gradient(145deg,#1b479d,#2558bb) !important;color:#fff !important;font-size:15px !important;font-weight:700 !important;cursor:pointer;box-shadow:0 6px 18px -3px rgba(27,71,157,0.38) !important;transition:all 0.2s;margin-left:auto;font-family:inherit !important;line-height:1 !important;text-decoration:none !important;display:inline-flex !important;align-items:center}' +
+'.fw-btn-next:hover{background:linear-gradient(145deg,#163d87,#1e4a9e) !important;transform:translateY(-1px);box-shadow:0 8px 24px -3px rgba(27,71,157,0.48) !important}' +
+'.fw-btn-next:disabled{background:#e2e8f0 !important;color:#94a3b8 !important;box-shadow:none !important;cursor:not-allowed;transform:none}' +
+'.fw-btn-primary{display:block !important;width:100% !important;padding:16px !important;border-radius:14px !important;border:none !important;background:linear-gradient(145deg,#1b479d,#2558bb) !important;color:#fff !important;font-size:16px !important;font-weight:700 !important;cursor:pointer;box-shadow:0 8px 24px -4px rgba(27,71,157,0.4) !important;transition:all 0.22s;letter-spacing:-0.2px;font-family:inherit !important;line-height:1.2 !important;text-decoration:none !important;text-align:center !important;margin-top:0 !important}' +
+'.fw-btn-primary:hover{background:linear-gradient(145deg,#163d87,#1e4a9e) !important;transform:translateY(-2px);box-shadow:0 12px 32px -4px rgba(27,71,157,0.5) !important}' +
+'.fw-form-top{display:flex;align-items:center;gap:14px;margin-bottom:22px}' +
+'.fw-form-icon{width:52px;height:52px;border-radius:15px;background:linear-gradient(145deg,#eef4ff,#dbe6ff);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(27,71,157,0.1);font-size:24px}' +
+'.fw-form-top-text h3{font-size:18px !important;font-weight:800 !important;color:#0f172a !important;letter-spacing:-0.4px;margin-bottom:4px !important;margin-top:0 !important}' +
+'.fw-form-top-text p{font-size:13.5px !important;color:#94a3b8 !important;line-height:1.55 !important;margin:0 !important}' +
+'.fw-field{margin-bottom:16px}' +
+'.fw-label{display:block !important;font-size:13px !important;font-weight:700 !important;color:#374151 !important;margin-bottom:8px;letter-spacing:0.1px}' +
+'.fw-input,.fw-select{display:block !important;width:100% !important;padding:13px 16px !important;border-radius:12px !important;border:2px solid #e5e7eb !important;background:#f9fafb !important;font-size:15px !important;color:#0f172a !important;outline:none;transition:border-color 0.2s,background 0.2s,box-shadow 0.2s;font-family:inherit !important;height:auto !important;line-height:1.5 !important}' +
+'.fw-input:focus,.fw-select:focus{border-color:#1b479d !important;background:#fff !important;box-shadow:0 0 0 4px rgba(27,71,157,0.1) !important}' +
+'.fw-select{cursor:pointer;appearance:none !important;-webkit-appearance:none !important;background-image:url("data:image/svg+xml,%3Csvg width=\'12\' height=\'8\' viewBox=\'0 0 12 8\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M1 1.5L6 6.5L11 1.5\' stroke=\'%2394a3b8\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/%3E%3C/svg%3E") !important;background-repeat:no-repeat !important;background-position:right 16px center !important;padding-right:40px !important}' +
+'.fw-err{display:none;font-size:12px !important;color:#ef4444 !important;font-weight:600 !important;margin-top:6px;padding-left:3px}' +
+'.fw-err.fw-show{display:block !important}' +
+'.fw-kvkk{display:flex;align-items:flex-start;gap:10px;margin-top:18px;margin-bottom:4px}' +
+'.fw-kvkk input[type="checkbox"]{flex-shrink:0;width:18px !important;height:18px !important;margin-top:2px;accent-color:#1b479d;cursor:pointer}' +
+'.fw-kvkk label{font-size:12.5px !important;color:#64748b !important;line-height:1.6 !important;cursor:pointer}' +
+'.fw-kvkk label a{color:#1b479d !important;text-decoration:underline !important;font-weight:600 !important}' +
+'.fw-kvkk label a:hover{color:#163d87 !important}' +
+'.fw-result-wrap{text-align:center;padding:8px 0 4px}' +
+'.fw-result-badge{width:108px;height:108px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:50px;margin-bottom:22px;animation:fw-bounce 0.7s cubic-bezier(0.34,1.56,0.64,1) both}' +
+'.fw-result-label{font-size:28px !important;font-weight:800 !important;color:#0f172a !important;letter-spacing:-0.7px;line-height:1.2 !important;margin-bottom:10px !important}' +
+'.fw-result-score{display:inline-block !important;font-size:13px !important;font-weight:700 !important;color:#1b479d !important;background:#eef4ff !important;padding:6px 18px !important;border-radius:99px !important;margin-bottom:18px !important}' +
+'.fw-result-desc{font-size:15px !important;color:#64748b !important;line-height:1.8 !important;max-width:360px;margin:0 auto 28px !important}' +
+'.fw-btn-restart{padding:13px 36px !important;border-radius:12px !important;border:2px solid #e2e8f0 !important;background:#f8fafc !important;color:#1b479d !important;font-size:15px !important;font-weight:700 !important;cursor:pointer;font-family:inherit !important;transition:all 0.2s;line-height:1 !important;box-shadow:none !important;text-decoration:none !important;display:inline-flex !important;align-items:center}' +
+'.fw-btn-restart:hover{background:#eef4ff !important;border-color:#a5bcf8 !important;transform:translateY(-1px)}' +
+'.fw-cta-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;text-align:left}' +
+'.fw-cta-btn{display:block !important;width:100% !important;padding:14px 18px !important;border-radius:14px !important;border:2px solid #e2e8f0 !important;background:#fff !important;color:#334155 !important;font-size:14.5px !important;font-weight:600 !important;cursor:pointer;transition:border-color 0.18s,background 0.18s,box-shadow 0.18s,transform 0.18s;text-align:left !important;font-family:inherit !important;line-height:1.5 !important;box-shadow:none !important;text-decoration:none !important;margin:0 !important}' +
+'.fw-cta-btn:hover{border-color:#a5bcf8 !important;background:#f7f9ff !important;box-shadow:0 3px 12px rgba(27,71,157,0.08) !important;transform:translateY(-1px)}' +
+'.fw-cta-btn.fw-cta-primary{border-color:#1b479d !important;background:linear-gradient(135deg,#eef4ff 0%,#dce8ff 100%) !important;color:#0f172a !important;font-weight:700 !important}' +
+'.fw-cta-btn.fw-cta-primary:hover{box-shadow:0 4px 16px rgba(27,71,157,0.16) !important;transform:translateY(-2px)}' +
+'.fw-ty-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(145deg,#d1fae5,#6ee7b7);display:inline-flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:22px;animation:fw-bounce 0.7s cubic-bezier(0.34,1.56,0.64,1) both}' +
+'.fw-ty-title{font-size:22px !important;font-weight:800 !important;color:#0f172a !important;letter-spacing:-0.5px;line-height:1.3 !important;margin-bottom:10px !important}' +
+'.fw-ty-desc{font-size:15px !important;color:#64748b !important;line-height:1.8 !important;max-width:340px;margin:0 auto 28px !important}' +
+'.fw-slide{animation:fw-slide-in 0.3s cubic-bezier(0.4,0,0.2,1) both}' +
+'@keyframes fw-bounce{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}85%{transform:scale(0.93)}100%{transform:scale(1);opacity:1}}' +
+'@keyframes fw-shimmer{0%{transform:translateX(-200%)}100%{transform:translateX(400%)}}' +
+'@keyframes fw-slide-in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}';
+
+var styleEl = document.createElement('style');
+styleEl.textContent = css;
+document.head.appendChild(styleEl);
+
+var QUESTIONS = [
+  {cat:'Karar Verme Yakla\u015f\u0131m\u0131',text:'\u00c7ocu\u011fum ile ilgili kararlar\u0131 verirken...',opts:['O anda h\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7enekleri tercih ederim.','H\u0131zl\u0131 \u00e7\u00f6z\u00fcm sa\u011flayan se\u00e7eneklere \u00f6ncelik veririm.','Ko\u015fullara g\u00f6re de\u011ferlendirme yapar\u0131m.','Daha \u00e7ok \u00e7ocu\u011fumun uzun vadeli faydas\u0131n\u0131 d\u00fc\u015f\u00fcn\u00fcr\u00fcm.','\u00c7ocu\u011fumun uzun vadeli faydas\u0131n\u0131 her zaman \u00f6nceli\u011fim olarak g\u00f6r\u00fcr\u00fcm.']},
+  {cat:'Okulda Sorumluluk',text:'Okuldaki sorumlulu\u011fum...',opts:['Yaln\u0131zca kendi \u00e7ocu\u011fumla s\u0131n\u0131rl\u0131d\u0131r.','Daha \u00e7ok kendi \u00e7ocu\u011fumla ilgili konulara odaklanmakt\u0131r.','Duruma g\u00f6re de\u011fi\u015fir.','Okul ortam\u0131n\u0131n geli\u015fimine katk\u0131 sa\u011flamay\u0131 da i\u00e7erir.','Hem \u00e7ocu\u011fumun hem de okul k\u00fclt\u00fcr\u00fcn\u00fcn geli\u015fimine katk\u0131 sa\u011flamay\u0131 i\u00e7erir.']},
+  {cat:'Okul Kurallar\u0131',text:'Okul kurallar\u0131n\u0131...',opts:['D\u00fc\u015f\u00fcnmeden uygular\u0131m.','\u00c7o\u011funlukla sorgulamadan uygular\u0131m.','Uygularken duruma g\u00f6re de\u011ferlendirme yapar\u0131m.','Uygularken arkas\u0131ndaki amac\u0131 anlamaya \u00e7al\u0131\u015f\u0131r\u0131m.','Bana uymasa bile amac\u0131n\u0131 anlamaya \u00e7al\u0131\u015f\u0131r ve desteklerim.']},
+  {cat:'\u0130\u015fbirli\u011fi',text:'Okuldan gelen geri bildirimler konusunda...',opts:['Geri bildirimleri her zaman uygulamam.','Baz\u0131 geri bildirimleri uygulamakta zorlanabilirim.','Geri bildirimleri duruma g\u00f6re de\u011ferlendiririm.','Geri bildirimleri dinler ve \u00e7o\u011funlukla dikkate al\u0131r\u0131m.','Geri bildirimleri dikkatle dinler ve her zaman de\u011ferlendirmeye \u00e7al\u0131\u015f\u0131r\u0131m.']},
+  {cat:'\u0130leti\u015fim',text:'Okul ile ileti\u015fim konusunda...',opts:['\u0130htiya\u00e7 duyuldu\u011funda ileti\u015fim kurmak yeterlidir.','Genellikle ihtiya\u00e7 an\u0131nda ileti\u015fim kurar\u0131m.','Duruma g\u00f6re ileti\u015fim kurar\u0131m.','D\u00fczenli ileti\u015fim kurmay\u0131 \u00f6nemsiyorum.','S\u00fcrekli ve d\u00fczenli ileti\u015fim kurmay\u0131 \u00e7ok \u00f6nemli buluyorum.']},
+  {cat:'Ba\u015far\u0131 Anlay\u0131\u015f\u0131',text:'Benim i\u00e7in \u00e7ocu\u011fum...',opts:['\u00d6zel okulda her \u00e7ocuk gibi ba\u015far\u0131l\u0131 olmal\u0131d\u0131r.','Daha \u00e7ok di\u011fer \u00e7ocuklarla benzer bir ba\u015far\u0131 d\u00fczeyi g\u00f6stermelidir.','Hem standart ba\u015far\u0131y\u0131 yakalamal\u0131 hem de bireysel olarak geli\u015fmelidir.','Kendi geli\u015fimi ve potansiyeli do\u011frultusunda ilerlemelidir.','Kendi bireysel geli\u015fimi ve potansiyeline g\u00f6re de\u011ferlendirilmelidir.']},
+  {cat:'Okulu Konumland\u0131rma',text:'Benim i\u00e7in okul...',opts:['Sadece hizmet ald\u0131\u011f\u0131m bir yer.','Daha \u00e7ok hizmet odakl\u0131 bir yer.','Hizmet ald\u0131\u011f\u0131m bir yer ama ayr\u0131ca bir \u00f6\u011frenme toplulu\u011fu oldu\u011funu da d\u00fc\u015f\u00fcn\u00fcyorum.','Bir \u00f6\u011frenme toplulu\u011fu.','Velilerin de payda\u015f oldu\u011fu bir \u00f6\u011frenme toplulu\u011fu.']}
+];
+
+var CLASSES = ['4 Ya\u015f','5 Ya\u015f','1. S\u0131n\u0131f','2. S\u0131n\u0131f','3. S\u0131n\u0131f','4. S\u0131n\u0131f','5. S\u0131n\u0131f','6. S\u0131n\u0131f','7. S\u0131n\u0131f','8. S\u0131n\u0131f'];
+
+var step = -1;
+var answers = [null,null,null,null,null,null,null];
+var form = {name:'',phone:'',grade:''};
+var lastCta = '';
+var result = {total:0,label:'',excludeRemarketing:false};
+
+var card    = document.getElementById('fw-card');
+var body    = document.getElementById('fw-body');
+var progWrap = document.getElementById('fw-progress-wrap');
+var progFill = document.getElementById('fw-progress-fill');
+var progLbl  = document.getElementById('fw-progress-label');
+
+function getAnswersData(){
+  var data={};
+  var answered=0;
+  for(var i=0;i<QUESTIONS.length;i++){
+    if(answers[i]!==null){
+      data['soru'+(i+1)+'_kategori']=QUESTIONS[i].cat;
+      data['soru'+(i+1)+'_cevap']=QUESTIONS[i].opts[answers[i]];
+      answered++;
+    }
+  }
+  data.cevaplanan_soru=answered;
+  return data;
+}
+
+function updateProgress(){
+  if(step<0||step>=7){ progWrap.style.display='none'; return; }
+  progWrap.style.display='block';
+  progFill.style.width=Math.round((step/7)*100)+'%';
+  progLbl.textContent='Soru '+(step+1)+' / 7';
+}
+
+function render(){
+  updateProgress();
+  body.innerHTML='';
+  var div=document.createElement('div');
+  div.className='fw-slide';
+  if(step===-1)       div.innerHTML=introHTML();
+  else if(step<=6)    div.innerHTML=questionHTML(step);
+  else if(step===7)   div.innerHTML=resultHTML();
+  else if(step===8)   div.innerHTML=formHTML();
+  else                div.innerHTML=thankYouHTML();
+  body.appendChild(div);
+  bindEvents();
+  card.scrollTop=0;
+}
+
+function introHTML(){
+  return '<div class="fw-intro-icon"><svg width="34" height="34" viewBox="0 0 34 34" fill="none"><path d="M6 27l3.5-10.5L25 6l3 3-15.5 15.5L6 27z" fill="#dbe6ff" stroke="#1b479d" stroke-width="1.8" stroke-linejoin="round"/><path d="M21.5 9.5l3 3" stroke="#1b479d" stroke-width="1.8" stroke-linecap="round"/></svg></div>'+
+    '<div class="fw-intro-title">E\u011fitim anlay\u0131\u015f\u0131n\u0131z Fide ile<br>ne kadar \u00f6rt\u00fc\u015f\u00fcyor?</div>'+
+    '<div class="fw-intro-desc">Fide\'nin e\u011fitim yakla\u015f\u0131m\u0131 ailenize ne kadar uygun? Hemen \u00f6\u011frenin.</div>'+
+    '<div class="fw-intro-chips"><div class="fw-chip"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="#64748b" stroke-width="1.5"/><path d="M8 5v3.5l2 2" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg> 2 dakika</div><div class="fw-chip"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M3 5h10M3 11h6" stroke="#64748b" stroke-width="1.5" stroke-linecap="round"/></svg> 7 soru</div></div>'+
+    '<button type="button" class="fw-btn-primary" data-action="start">Teste Ba\u015fla &rarr;</button>';
+}
+
+function questionHTML(i){
+  var q=QUESTIONS[i];
+  var opts=q.opts.map(function(o,idx){
+    var sel=answers[i]===idx?' fw-sel':'';
+    return '<div class="fw-opt'+sel+'" data-action="pick" data-idx="'+idx+'"><div class="fw-radio"><div class="fw-radio-dot"></div></div><div class="fw-opt-text">'+esc(o)+'</div></div>';
+  }).join('');
+  var backBtn=i>0?'<button type="button" class="fw-btn-back" data-action="back">&#8592; Geri</button>':'<span></span>';
+  var isLast=i===QUESTIONS.length-1;
+  return '<div class="fw-cat">'+esc(q.cat)+'</div>'+
+    '<div class="fw-qtext">'+esc(q.text)+'</div>'+
+    '<div class="fw-options">'+opts+'</div>'+
+    '<div class="fw-nav">'+backBtn+
+    '<button type="button" class="fw-btn-next" data-action="next"'+(answers[i]===null?' disabled':'')+'>'+(isLast?'Sonucu G\u00f6r':'Devam')+'</button></div>';
+}
+
+function formHTML(){
+  var opts=CLASSES.map(function(c){return '<option value="'+esc(c)+'"'+(form.grade===c?' selected':'')+'>'+esc(c)+'</option>';}).join('');
+  return '<div class="fw-form-top"><div class="fw-form-icon">&#128203;</div><div class="fw-form-top-text"><h3>Sizinle ileti\u015fime ge\u00e7elim</h3><p>Bilgilerinizi b\u0131rak\u0131n, size<br>en k\u0131sa s\u00fcrede ula\u015fal\u0131m.</p></div></div>'+
+    '<div class="fw-field"><label class="fw-label" for="fw-name">Veli Ad\u0131 Soyad\u0131</label><input class="fw-input" type="text" id="fw-name" placeholder="Ad\u0131n\u0131z Soyad\u0131n\u0131z" value="'+esc(form.name)+'"><div class="fw-err" id="fw-err-name">L\u00fctfen ad\u0131n\u0131z\u0131 ve soyad\u0131n\u0131z\u0131 girin.</div></div>'+
+    '<div class="fw-field"><label class="fw-label" for="fw-phone">Telefon Numaras\u0131</label><input class="fw-input" type="tel" id="fw-phone" placeholder="05__ ___ __ __" value="'+esc(form.phone)+'"><div class="fw-err" id="fw-err-phone">L\u00fctfen telefon numaras\u0131n\u0131z\u0131 girin.</div></div>'+
+    '<div class="fw-field"><label class="fw-label" for="fw-grade">\u00d6\u011frenci S\u0131n\u0131f Bilgisi</label><select class="fw-select" id="fw-grade"><option value="">S\u0131n\u0131f se\u00e7iniz</option>'+opts+'</select><div class="fw-err" id="fw-err-grade">L\u00fctfen bir s\u0131n\u0131f se\u00e7in.</div></div>'+
+    '<div class="fw-kvkk"><input type="checkbox" id="fw-kvkk"><label for="fw-kvkk"><a href="https://www.fideokullari.k12.tr/kvkk/" target="_blank">Ayd\u0131nlatma Metnini</a> okudum ve ki\u015fisel verilerimin i\u015flenmesini kabul ediyorum.</label></div>'+
+    '<div class="fw-err" id="fw-err-kvkk">L\u00fctfen ayd\u0131nlatma metnini onaylay\u0131n.</div>'+
+    '<div class="fw-nav"><button type="button" class="fw-btn-back" data-action="back">&#8592; Geri</button><button type="button" class="fw-btn-next" data-action="submit">G\u00f6nder</button></div>';
+}
+
+function resultHTML(){
+  var total=0; for(var i=0;i<answers.length;i++) total+=answers[i]+1;
+  result.total=total;
+  result.label=total>=28?'\u00c7ok Uygun':total>=21?'Uygun':'Uygun Olmayabilir';
+  result.excludeRemarketing=total<21;
+  var label,emoji,bg,desc,ctas;
+  if(total>=28){
+    label='&#199;ok Uygun';emoji='&#11088;';bg='background:linear-gradient(145deg,#fef9c3,#fde68a)';
+    desc='G\u00f6r\u00fcn\u00fc\u015fe g\u00f6re Fide\'nin e\u011fitim yakla\u015f\u0131m\u0131 ailenizin beklentileriyle g\u00fc\u00e7l\u00fc bir uyum i\u00e7inde. \u015eimdi Fide\'yi daha yak\u0131ndan tan\u0131man\u0131n tam zaman\u0131.';
+    ctas='<div class="fw-cta-list">'+
+      '<button type="button" class="fw-cta-btn fw-cta-primary" data-action="cta" data-cta="bilgi">Fide ile ilgili detayl\u0131 bilgi almak istiyorum.</button>'+
+      '<button type="button" class="fw-cta-btn" data-action="cta" data-cta="haber">Fide\'deki geli\u015fmelerden haberdar olmak istiyorum.</button>'+
+      '<button type="button" class="fw-cta-btn" data-action="cta" data-cta="tesekkur">\u015eu an i\u00e7in te\u015fekk\u00fcr ederim. Belki bir ba\u015fka zaman.</button></div>';
+  }
+  else if(total>=21){
+    label='Uygun';emoji='&#9989;';bg='background:linear-gradient(145deg,#d1fae5,#6ee7b7)';
+    desc='G\u00f6r\u00fcn\u00fc\u015fe g\u00f6re Fide\'nin e\u011fitim yakla\u015f\u0131m\u0131 ailenizin beklentileriyle g\u00fc\u00e7l\u00fc bir uyum i\u00e7inde. \u015eimdi Fide\'yi daha yak\u0131ndan tan\u0131man\u0131n tam zaman\u0131.';
+    ctas='<div class="fw-cta-list">'+
+      '<button type="button" class="fw-cta-btn fw-cta-primary" data-action="cta" data-cta="bilgi">Fide ile ilgili detayl\u0131 bilgi almak istiyorum.</button>'+
+      '<button type="button" class="fw-cta-btn" data-action="cta" data-cta="haber">Fide\'deki geli\u015fmelerden haberdar olmak istiyorum.</button>'+
+      '<button type="button" class="fw-cta-btn" data-action="cta" data-cta="tesekkur">\u015eu an i\u00e7in te\u015fekk\u00fcr ederim. Belki bir ba\u015fka zaman.</button></div>';
+  }
+  else{
+    label='Uygun Olmayabilir';emoji='&#128161;';bg='background:linear-gradient(145deg,#dbeafe,#93c5fd)';
+    desc='G\u00f6rd\u00fc\u011f\u00fcm\u00fcz kadar\u0131yla bizim ve sizin tercihleriniz farkl\u0131 ama yine de okuldan beklentilerinizi ve \u00e7ocu\u011funuzun ihtiya\u00e7lar\u0131n\u0131 konu\u015fabilece\u011fimiz bir g\u00f6r\u00fc\u015fmede bulu\u015fmak isteriz.';
+    ctas='<div class="fw-cta-list">'+
+      '<button type="button" class="fw-cta-btn fw-cta-primary" data-action="cta" data-cta="gorusme">Ben de g\u00f6r\u00fc\u015fmek isterim.</button>'+
+      '<button type="button" class="fw-cta-btn" data-action="cta" data-cta="tesekkur">\u015eu an i\u00e7in te\u015fekk\u00fcr ederim. Belki bir ba\u015fka zaman.</button></div>';
+  }
+  return '<div class="fw-result-wrap"><div class="fw-result-badge" style="'+bg+'">'+emoji+'</div>'+
+    '<div class="fw-result-label">'+label+'</div>'+
+    '<div class="fw-result-score">'+total+' / 35 puan</div>'+
+    '<div class="fw-result-desc">'+desc+'</div>'+
+    ctas+
+    '<button type="button" class="fw-btn-restart" data-action="restart">Tekrar \u00c7\u00f6z</button></div>';
+}
+
+function thankYouHTML(){
+  var msg,icon;
+  if(lastCta==='gorusme'||lastCta==='bilgi'){
+    icon='&#128222;';
+    msg='Anketimizi yan\u0131tlad\u0131\u011f\u0131n\u0131z i\u00e7in te\u015fekk\u00fcr ederiz. Sizinle en k\u0131sa s\u00fcrede ileti\u015fime ge\u00e7ece\u011fiz.';
+  } else {
+    icon='&#128276;';
+    msg='Anketimizi yan\u0131tlad\u0131\u011f\u0131n\u0131z i\u00e7in te\u015fekk\u00fcr ederiz. G\u00f6r\u00fc\u015fmek dile\u011fiyle.';
+  }
+  return '<div class="fw-result-wrap">'+
+    '<div class="fw-ty-icon">'+icon+'</div>'+
+    '<div class="fw-ty-title">Te\u015fekk\u00fcrler!</div>'+
+    '<div class="fw-ty-desc">'+msg+'</div>'+
+    '<button type="button" class="fw-btn-restart" data-action="restart">Yeniden Ba\u015fla</button></div>';
+}
+
+function bindEvents(){
+  var els=body.querySelectorAll('[data-action]');
+  for(var i=0;i<els.length;i++) els[i].addEventListener('click',handleAction);
+}
+
+function handleAction(e){
+  e.preventDefault();
+  var action=e.currentTarget.getAttribute('data-action');
+  if(action==='start'){
+    step=0; render();
+    try{ window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'fide_funnel_1_basladi'}); }catch(ex){}
+  }
+  else if(action==='pick'){
+    var idx=parseInt(e.currentTarget.getAttribute('data-idx'),10);
+    answers[step]=idx;
+    var allOpts=body.querySelectorAll('.fw-opt');
+    for(var j=0;j<allOpts.length;j++) allOpts[j].classList.remove('fw-sel');
+    e.currentTarget.classList.add('fw-sel');
+    var nextBtn=body.querySelector('.fw-btn-next');
+    if(nextBtn) nextBtn.disabled=false;
+  }
+  else if(action==='next'){
+    if(answers[step]===null)return;
+    step++;
+    render();
+    if(step===7){
+      try{ window.dataLayer=window.dataLayer||[]; window.dataLayer.push({event:'fide_funnel_2_sonuc_gordu',fide_skor:result.total,fide_sonuc:result.label}); }catch(ex){}
+    }
+  }
+  else if(action==='back'){ step--; render(); }
+  else if(action==='submit'){ submitForm(); }
+  else if(action==='cta'){
+    var ctaType=e.currentTarget.getAttribute('data-cta');
+    lastCta=ctaType;
+    if(ctaType==='tesekkur'){
+      step=9; render();
+    } else {
+      step=8; render();
+    }
+  }
+  else if(action==='restart'){
+    step=-1; answers=[null,null,null,null,null,null,null]; form={name:'',phone:'',grade:''}; lastCta=''; result={total:0,label:'',excludeRemarketing:false}; render();
+  }
+}
+
+function sha256(str){
+  var buf=new TextEncoder().encode(str.toLowerCase().trim());
+  return crypto.subtle.digest('SHA-256',buf).then(function(h){
+    return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  });
+}
+
+function submitForm(){
+  var n=(document.getElementById('fw-name')||{value:''}).value.trim();
+  var p=(document.getElementById('fw-phone')||{value:''}).value.trim();
+  var g=(document.getElementById('fw-grade')||{value:''}).value;
+  var kvkk=(document.getElementById('fw-kvkk')||{}).checked;
+  toggleErr('fw-err-name',!n); toggleErr('fw-err-phone',!p); toggleErr('fw-err-grade',!g); toggleErr('fw-err-kvkk',!kvkk);
+  if(!n||!p||!g||!kvkk) return;
+  form={name:n,phone:p,grade:g};
+
+  var webhookData={event:'fide_test_tamamlandi',fide_skor:result.total,fide_sonuc:result.label,fide_cta_type:lastCta,fide_veli_adi:n,fide_telefon:p,fide_sinif:g,fide_remarketing_haric:result.excludeRemarketing};
+  Object.assign(webhookData,getAnswersData());
+  sendToWebhook(webhookData);
+
+  Promise.all([sha256(n),sha256(p)]).then(function(hashes){
+    window.dataLayer=window.dataLayer||[];
+    window.dataLayer.push({event:'fide_test_tamamlandi',fide_skor:result.total,fide_sonuc:result.label,fide_cta_type:lastCta,fide_veli_adi_hash:hashes[0],fide_telefon_hash:hashes[1],fide_sinif:g,fide_remarketing_haric:result.excludeRemarketing});
+  });
+
+  step=9; render();
+}
+
+function toggleErr(id,show){
+  var el=document.getElementById(id);
+  if(!el) return;
+  if(show) el.classList.add('fw-show'); else el.classList.remove('fw-show');
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Inline: direkt render et, popup/overlay yok
+step=-1;
+render();
+
+})();
+</script>
