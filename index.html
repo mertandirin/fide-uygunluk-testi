@@ -8,7 +8,7 @@
 *,*::before,*::after{box-sizing:border-box}
 html,body{margin:0;padding:0;min-height:100vh;background:linear-gradient(160deg,#e8f0ff 0%,#f0f4ff 50%,#eef2fb 100%)}
 body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 16px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.page-logo{margin-bottom:32px;opacity:0.6;font-size:13px;font-weight:600;color:#64748b;letter-spacing:0.5px}
+@media(max-width:600px){body{padding:16px 12px 40px}}
 </style>
 </head>
 <body>
@@ -125,7 +125,8 @@ var css =
 '.fw-slide{animation:fw-slide-in 0.3s cubic-bezier(0.4,0,0.2,1) both}' +
 '@keyframes fw-bounce{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}85%{transform:scale(0.93)}100%{transform:scale(1);opacity:1}}' +
 '@keyframes fw-shimmer{0%{transform:translateX(-200%)}100%{transform:translateX(400%)}}' +
-'@keyframes fw-slide-in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}';
+'@keyframes fw-slide-in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}' +
+'@media(max-width:600px){#fw-wrap{max-width:100% !important;padding:0 !important}#fw-card{border-radius:16px !important}#fw-header{padding:22px 20px 20px !important}#fw-header h1{font-size:19px !important}#fw-body{padding:20px 18px 24px !important}.fw-qtext{font-size:16px !important}.fw-btn-next{padding:13px 22px !important;font-size:14px !important}.fw-btn-primary{font-size:15px !important;padding:15px !important}.fw-cta-btn{font-size:13.5px !important;padding:13px 15px !important}.fw-result-label{font-size:24px !important}.fw-result-badge{width:88px !important;height:88px !important;font-size:42px !important}}';
 
 var styleEl = document.createElement('style');
 styleEl.textContent = css;
