@@ -1,31 +1,29 @@
-<button type="button" id="fw-bubble" aria-label="Fide Size Ne Kadar Uygun? Testini A&#231;">
-  <span class="fw-bubble-icon">
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.8"/>
-      <circle cx="9" cy="9" r="2.6" fill="currentColor"/>
-    </svg>
-  </span>
-  <span class="fw-bubble-text">Fide Size Ne Kadar Uygun?</span>
-</button>
-
-<div id="fw-overlay" class="fw-hidden">
-  <div id="fw-card">
-    <div id="fw-header">
-      <button type="button" id="fw-close" aria-label="Kapat">
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1l11 11M12 1L1 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
-      </button>
-      <div class="fw-header-badge">
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="6" r="1.8" fill="currentColor"/></svg>
-        Fide Okullar&#305;
+<div id="fw-root">
+  <button type="button" id="fw-bubble">
+    <span class="fw-bubble-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="9" r="2.6" fill="currentColor"/></svg>
+    </span>
+    <span class="fw-bubble-text">Fide Size Ne Kadar Uygun?</span>
+  </button>
+  <div id="fw-overlay" class="fw-hidden">
+    <div id="fw-card">
+      <div id="fw-header">
+        <button type="button" id="fw-close">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 1l11 11M12 1L1 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="fw-header-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="6" r="1.8" fill="currentColor"/></svg>
+          Fide Okullar&#305;
+        </div>
+        <h1>Fide Size Ne Kadar Uygun?</h1>
+        <p>7 k&#305;sa soruyla bunu hemen &#246;&#287;renin.</p>
       </div>
-      <h1>Fide Size Ne Kadar Uygun?</h1>
-      <p>7 k&#305;sa soruyla bunu hemen &#246;&#287;renin.</p>
+      <div id="fw-progress-wrap" style="display:none">
+        <div id="fw-progress-track"><div id="fw-progress-fill" style="width:0%"></div></div>
+        <div id="fw-progress-label">Soru 1 / 7</div>
+      </div>
+      <div id="fw-body"></div>
     </div>
-    <div id="fw-progress-wrap" style="display:none">
-      <div id="fw-progress-track"><div id="fw-progress-fill" style="width:0%"></div></div>
-      <div id="fw-progress-label">Soru 1 / 7</div>
-    </div>
-    <div id="fw-body"></div>
   </div>
 </div>
 
@@ -414,6 +412,5 @@ function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Pop-up: balon tıklanınca açılır, otomatik açılmaz
 })();
 </script>
