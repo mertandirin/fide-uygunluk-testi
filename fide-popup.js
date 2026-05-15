@@ -51,7 +51,7 @@ var launchers = document.getElementById('fw-launchers');
 var bubble    = document.getElementById('fw-bubble');
 var waBtn     = document.getElementById('fw-wa');
 
-var WA_NUMBER = '905465290475';
+var WA_NUMBER = window.location.href.indexOf('fide-yaz-okulu-2026') !== -1 ? '905465290474' : '905465290475';
 
 bubble.addEventListener('click', openWidget);
 waBtn.addEventListener('click', function(){
